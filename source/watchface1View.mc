@@ -3,8 +3,9 @@ import Toybox.Graphics;
 import Toybox.Lang;
 import Toybox.System;
 import Toybox.WatchUi;
-import Toybox.Time;
+//import Toybox.Time;
 using Toybox.Time.Gregorian;
+//using Toybox.Graphics.Dc;
 
 
 class watchface1View extends WatchUi.WatchFace {
@@ -27,7 +28,7 @@ class watchface1View extends WatchUi.WatchFace {
     // Update the view
     function onUpdate(dc as Dc) as Void {
         // Get the current time and format it correctly
-        var timeFormat = "$1$:$2$.$3$";
+        var timeFormat = "$1$:$2$";
         var clockTime = System.getClockTime();
         var myStats = System.getSystemStats();
         var batt = myStats.battery;
@@ -51,30 +52,42 @@ class watchface1View extends WatchUi.WatchFace {
             }
         } else {
             if (getApp().getProperty("UseMilitaryFormat")) {
-                timeFormat = "$1$$2$.$3$";
+                timeFormat = "$1$$2$";
                 hours = hours.format("%02d");
             }
         }
-        var timeString = Lang.format(timeFormat, [hours.format("%02d"), clockTime.min.format("%02d"), clockTime.sec.format("%02d")]);
+        var timeString = Lang.format(timeFormat, [hours.format("%02d"), clockTime.min.format("%02d")]);
 
         // Update the views
         var view1 = View.findDrawableById("TimeLabel") as Text;
-        view1.setColor(Graphics.COLOR_WHITE);
+        view1.setColor(Graphics.COLOR_YELLOW);
         view1.setText(timeString);
 
         var view2 = View.findDrawableById("BatteryLabel") as Text;
-        view2.setColor(Graphics.COLOR_WHITE);
+        view2.setColor(Graphics.COLOR_DK_GREEN);
+        if (batt <= 20){
+            view2.setColor(Graphics.COLOR_DK_RED);
+        }
         view2.setText(batt.format("%02d")+"%");
+
         if (HR != null){
             var view3 = View.findDrawableById("HRLabel") as Text;
-            view3.setColor(Graphics.COLOR_WHITE);
+            view3.setColor(Graphics.COLOR_DK_GREEN);
+            if (HR >= 160) {
+                view3.setColor(Graphics.COLOR_DK_RED);
+            }
             view3.setText(HR.format("%02d")+" BPM");
+        } else {
+            var view3 = View.findDrawableById("HRLabel") as Text;
+            view3.setColor(Graphics.COLOR_DK_RED);
+            view3.setText("-- BPM");
         }
 
         var view4 = View.findDrawableById("DateLabel") as Text;
-        view4.setColor(Graphics.COLOR_WHITE);
+        view4.setColor(Graphics.COLOR_YELLOW);
         view4.setText(date);
 
+       
         // Call the parent onUpdate function to redraw the layout
         View.onUpdate(dc);
     }
