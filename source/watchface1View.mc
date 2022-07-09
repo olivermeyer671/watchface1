@@ -3,6 +3,9 @@ import Toybox.Graphics;
 import Toybox.Lang;
 import Toybox.System;
 import Toybox.WatchUi;
+import Toybox.Time;
+using Toybox.Time.Gregorian;
+
 
 class watchface1View extends WatchUi.WatchFace {
 
@@ -30,7 +33,17 @@ class watchface1View extends WatchUi.WatchFace {
         var batt = myStats.battery;
         var HR = Activity.getActivityInfo().currentHeartRate;
         
-        System.println(batt.format("%02d"));
+        var today = Gregorian.info(Time.now(), Time.FORMAT_MEDIUM);
+        var date = Lang.format(
+            "$1$-$2$ $3$ $4$",
+            [
+                today.day_of_week,
+                today.day,
+                today.month,
+                today.year
+            ]
+        );
+        
         var hours = clockTime.hour;
         if (!System.getDeviceSettings().is24Hour) {
             if (hours > 12) {
@@ -44,19 +57,24 @@ class watchface1View extends WatchUi.WatchFace {
         }
         var timeString = Lang.format(timeFormat, [hours.format("%02d"), clockTime.min.format("%02d"), clockTime.sec.format("%02d")]);
 
-        // Update the view
+        // Update the views
         var view1 = View.findDrawableById("TimeLabel") as Text;
-        view1.setColor(getApp().getProperty("ForegroundColor") as Number);
+        view1.setColor(Graphics.COLOR_WHITE);
         view1.setText(timeString);
 
         var view2 = View.findDrawableById("BatteryLabel") as Text;
-        view2.setColor(getApp().getProperty("ForegroundColor") as Number);
+        view2.setColor(Graphics.COLOR_WHITE);
         view2.setText(batt.format("%02d")+"%");
         if (HR != null){
             var view3 = View.findDrawableById("HRLabel") as Text;
-            view3.setColor(getApp().getProperty("ForegroundColor") as Number);
+            view3.setColor(Graphics.COLOR_WHITE);
             view3.setText(HR.format("%02d")+" BPM");
         }
+
+        var view4 = View.findDrawableById("DateLabel") as Text;
+        view4.setColor(Graphics.COLOR_WHITE);
+        view4.setText(date);
+
         // Call the parent onUpdate function to redraw the layout
         View.onUpdate(dc);
     }
